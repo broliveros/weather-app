@@ -8,31 +8,42 @@ document.addEventListener("DOMContentLoaded", () => {
     const historyList = document.getElementById("search-history");
     let history = JSON.parse(localStorage.getItem("weatherHistory")) || [];
 
-    function renderHistory() {
+    function renderHistory(filter = "") {
         historyList.innerHTML = "";
-        if (history.lenght === 0) {
+
+        const filtered = history.filter(city =>
+            city.toLowerCase().startsWith(filter.toLowerCase())
+        );
+        
+        if (history.length === 0) {
             historyList.classList.add("hidden");
             return;
         }
 
-        historyList.classList.remove("hidden");
-
-        history.forEach((city) => {
+            filtered.forEach((city) => {
             const li = document.createElement("li");
             li.textContent = city;
             li.addEventListener("click", () => {
                 input.value = city;
-                form.dispatchEvent(new Event("subtmit"));
+                form.dispatchEvent(new Event("submit"));
                 historyList.classList.add("hidden");
             });
             historyList.appendChild(li);
         });
+
+        historyList.classList.remove("hidden");
     }
 
 input.addEventListener("input", () => {
     if (input.value.trim() === "") {
         historyList.classList.add("hidden");
     } else {
+        renderHistory();
+    }
+});
+
+input.addEventListener("focus", () => {
+    if (input.value.trim() === "") {
         renderHistory();
     }
 });
@@ -92,4 +103,11 @@ input.addEventListener("input", () => {
   });
 
   renderHistory();
+
+document.addEventListener("click", (e) => {
+    if (!input.contains(e.target) && !historyList.contains(e.target)) {
+        historyList.classList.add("hidden");
+    }
 });
+});
+
